@@ -1,188 +1,209 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Downloader</title>
-    <style>
-        /* Đặt font chữ dễ đọc và reset cơ bản */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* Tạo một "thẻ" (card) chính giữa màn hình */
-        .container {
-            background-color: #ffffff;
-            padding: 2.5rem; /* Tăng khoảng đệm */
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: #1c1e21;
-            margin-bottom: 0.5rem;
-        }
-
-        p {
-            color: #606770;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        /* Ô nhập liệu */
-        input[type="text"] {
-            width: 100%;
-            padding: 14px 16px; /* Làm ô input cao hơn */
-            box-sizing: border-box;
-            border-radius: 8px;
-            border: 1px solid #dddfe2;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        input[type="text"]:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
-            outline: none;
-        }
-
-        /* Nút bấm */
-        button {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #ffffff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-        
-        button:disabled {
-            background-color: #9dbdfa; /* Màu nhạt hơn khi đang tải */
-            cursor: not-allowed;
-        }
-
-        /* Khu vực kết quả */
-        #results {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: #f7f7f7;
-            border-radius: 8px;
-            text-align: left;
-            display: none; /* Ẩn ban đầu */
-        }
-        
-        #results h3 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        /* Nút download trong kết quả */
-        #results a {
-            display: inline-block;
-            background: #28a745; /* Màu xanh lá */
-            color: white;
-            padding: 12px 18px;
-            text-decoration: none;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-weight: bold;
-            transition: background-color 0.2s ease;
-        }
-        
-        #results a:hover {
-            background-color: #218838;
-        }
-
-        /* Thông báo lỗi */
-        #error {
-            color: #dc3545; /* Màu đỏ */
-            margin-top: 1rem;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Video Downloader V3</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+        background-size: 400% 400%;
+        animation: gradientMove 12s ease infinite;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        overflow-x: hidden;
+    }
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        animation: slideIn 0.8s ease-out forwards;
+        opacity: 0;
+    }
+    @keyframes slideIn {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+        transition: all 0.4s ease;
+    }
+    h1 {
+        font-size: 1.9rem;
+        color: #222;
+        margin-bottom: 0.4rem;
+    }
+    p {
+        color: #555;
+        margin-bottom: 1.8rem;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    input[type="text"]:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0,123,255,0.4);
+        transform: scale(1.02);
+        outline: none;
+    }
+    button {
+        margin-top: 10px;
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(90deg, #007bff, #00c6ff);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -75%;
+        width: 50%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: skewX(-25deg);
+        transition: left 0.6s ease;
+    }
+    button:hover::before {
+        left: 125%;
+    }
+    button:hover {
+        box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        transform: translateY(-1px);
+    }
+    #results {
+        display: none;
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f7f7f7;
+        border-radius: 10px;
+        animation: fadeIn 0.6s ease forwards;
+    }
+    #results video {
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    #results h3 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    #results a {
+        display: inline-block;
+        background: linear-gradient(90deg, #28a745, #34d058);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 6px;
+        font-weight: bold;
+        text-decoration: none;
+        margin-top: 12px;
+        transition: all 0.25s ease;
+    }
+    #results a:hover {
+        background: linear-gradient(90deg, #218838, #2ebd5f);
+        transform: translateY(-2px);
+    }
+    #error {
+        margin-top: 1rem;
+        color: #e63946;
+        font-weight: bold;
+        animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Video Downloader</h1>
-        <p>Dán link video vào đây. (Cảnh báo: Có thể không hoạt động do server bị chặn).</p>
-        
-        <input type="text" id="videoUrl" placeholder="https://www.xvideos.com/video...">
-        <button id="submitBtn">Lấy thông tin</button>
+<div class="container">
+    <h1>🎥 Video Downloader</h1>
+    <p>Dán link video vào đây để xem và tải trực tiếp bên dưới.</p>
 
-        <div id="error"></div>
-        
-        <div id="results">
-            </div>
-    </div>
+    <input type="text" id="videoUrl" placeholder="https://www.xvideos.com/video...">
+    <button id="submitBtn">🚀 Lấy video</button>
 
-    <script>
-        const submitBtn = document.getElementById('submitBtn');
-        const videoUrlInput = document.getElementById('videoUrl');
-        const resultsDiv = document.getElementById('results');
-        const errorDiv = document.getElementById('error');
+    <div id="error"></div>
+    <div id="results"></div>
+</div>
 
-        submitBtn.addEventListener('click', async () => {
-            const url = videoUrlInput.value.trim();
-            if (!url) {
-                alert('Vui lòng dán URL');
-                return;
-            }
+<script>
+const submitBtn = document.getElementById('submitBtn');
+const videoUrlInput = document.getElementById('videoUrl');
+const resultsDiv = document.getElementById('results');
+const errorDiv = document.getElementById('error');
 
-            // Xóa kết quả cũ và ẩn/hiện các mục
-            resultsDiv.innerHTML = '';
-            resultsDiv.style.display = 'none'; // Ẩn kết quả
-            errorDiv.innerHTML = '';
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Đang tải...';
+submitBtn.addEventListener('click', async () => {
+    const url = videoUrlInput.value.trim();
+    if (!url) {
+        alert('⚠️ Vui lòng nhập URL video');
+        return;
+    }
 
-            try {
-                // Gọi đến Netlify Function
-                const response = await fetch(`/api/getVideo?url=${encodeURIComponent(url)}`);
-                const data = await response.json();
+    resultsDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Đang tải...';
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Lỗi không xác định');
-                }
+    try {
+        const response = await fetch(`/api/getVideo?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
 
-                // Hiển thị kết quả và nút download
-                resultsDiv.style.display = 'block'; // Hiện kết quả
-                resultsDiv.innerHTML = `
-                    <h3>${data.title}</h3>
-                    <p>Thời lượng: ${data.duration} | Lượt xem: ${data.views}</p>
-                    <a href="${data.downloadUrl}" target="_blank" rel="noopener noreferrer" download="${data.title}.mp4">
-                        Tải video (Click chuột phải & chọn 'Save Link As...')
-                    </a>
-                `;
+        if (!response.ok) throw new Error(data.error || 'Lỗi không xác định.');
 
-            } catch (err) {
-                // Hiển thị lỗi
-                errorDiv.innerHTML = `<strong>Lỗi:</strong> ${err.message}`;
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Lấy thông tin';
-            }
-        });
-    </script>
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = `
+            <h3>${data.title}</h3>
+            <p>⏱ Thời lượng: ${data.duration} | 👁 Lượt xem: ${data.views}</p>
+            <video controls autoplay>
+                <source src="${data.downloadUrl}" type="video/mp4">
+                Trình duyệt của bạn không hỗ trợ video.
+            </video>
+            <a href="${data.downloadUrl}" download="${data.title}.mp4" target="_blank">💾 Tải video này</a>
+        `;
+    } catch (err) {
+        errorDiv.textContent = `❌ ${err.message}`;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '🚀 Lấy video';
+    }
+});
+</script>
+
 </body>
 </html>
