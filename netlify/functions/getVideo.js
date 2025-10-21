@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 // ‼️ API KEY CỦA BẠN (Đã hoạt động tốt)
-const API_KEY = '10fdd209c00734a4796eaa20f20b727'; // Giữ nguyên key của bạn
+const API_KEY = '10fdd209c00734a4796eaa20f120b727'; // Giữ nguyên key của bạn
 
 exports.handler = async (event, context) => {
   const videoUrl = event.queryStringParameters.url;
