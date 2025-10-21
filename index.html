@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+    <style>
+        /* Đặt font chữ dễ đọc và reset cơ bản */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Tạo một "thẻ" (card) chính giữa màn hình */
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Tăng khoảng đệm */
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #1c1e21;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #606770;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        /* Ô nhập liệu */
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px; /* Làm ô input cao hơn */
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid #dddfe2;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+            outline: none;
+        }
+
+        /* Nút bấm */
+        button {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #9dbdfa; /* Màu nhạt hơn khi đang tải */
+            cursor: not-allowed;
+        }
+
+        /* Khu vực kết quả */
+        #results {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f7f7f7;
+            border-radius: 8px;
+            text-align: left;
+            display: none; /* Ẩn ban đầu */
+        }
+        
+        #results h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        /* Nút download trong kết quả */
+        #results a {
+            display: inline-block;
+            background: #28a745; /* Màu xanh lá */
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+        
+        #results a:hover {
+            background-color: #218838;
+        }
+
+        /* Thông báo lỗi */
+        #error {
+            color: #dc3545; /* Màu đỏ */
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Video Downloader</h1>
+        <p>Dán link video vào đây. (Cảnh báo: Có thể không hoạt động do server bị chặn).</p>
+        
+        <input type="text" id="videoUrl" placeholder="https://www.xvideos.com/video...">
+        <button id="submitBtn">Lấy thông tin</button>
+
+        <div id="error"></div>
+        
+        <div id="results">
+            </div>
+    </div>
+
+    <script>
+        const submitBtn = document.getElementById('submitBtn');
+        const videoUrlInput = document.getElementById('videoUrl');
+        const resultsDiv = document.getElementById('results');
+        const errorDiv = document.getElementById('error');
+
+        submitBtn.addEventListener('click', async () => {
+            const url = videoUrlInput.value.trim();
+            if (!url) {
+                alert('Vui lòng dán URL');
+                return;
+            }
+
+            // Xóa kết quả cũ và ẩn/hiện các mục
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'none'; // Ẩn kết quả
+            errorDiv.innerHTML = '';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang tải...';
+
+            try {
+                // Gọi đến Netlify Function
+                const response = await fetch(`/api/getVideo?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Lỗi không xác định');
+                }
+
+                // Hiển thị kết quả và nút download
+                resultsDiv.style.display = 'block'; // Hiện kết quả
+                resultsDiv.innerHTML = `
+                    <h3>${data.title}</h3>
+                    <p>Thời lượng: ${data.duration} | Lượt xem: ${data.views}</p>
+                    <a href="${data.downloadUrl}" target="_blank" rel="noopener noreferrer" download="${data.title}.mp4">
+                        Tải video (Click chuột phải & chọn 'Save Link As...')
+                    </a>
+                `;
+
+            } catch (err) {
+                // Hiển thị lỗi
+                errorDiv.innerHTML = `<strong>Lỗi:</strong> ${err.message}`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Lấy thông tin';
+            }
+        });
+    </script>
+</body>
+</html>
