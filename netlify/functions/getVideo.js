@@ -1,8 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// ‼️ HÃY DÁN API KEY CỦA BẠN VÀO ĐÂY
-const API_KEY = '10fdd209c00734a4796eaa20f120b727'; // ⬅️ Thay thế bằng key của bạn
+// ‼️ API KEY CỦA BẠN (Đã hoạt động tốt)
+const API_KEY = '10fdd209c00734a4796eaa20f20b727'; // Giữ nguyên key của bạn
 
 exports.handler = async (event, context) => {
   const videoUrl = event.queryStringParameters.url;
@@ -13,24 +13,26 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Tạo link API để "nhờ" ScraperAPI tải hộ
   const scrapeUrl = `http://api.scraperapi.com?api_key=${API_KEY}&url=${encodeURIComponent(videoUrl)}`;
 
   try {
-    // 1. Dùng axios để gọi API cào web
     const response = await axios.get(scrapeUrl);
-    
-    // 2. Lấy HTML thô trả về
     const html = response.data;
-    
-    // 3. Dùng Cheerio để "đọc" HTML
     const $ = cheerio.load(html);
 
-    // 4. Tự phân tích HTML để tìm thông tin
-    // LƯU Ý: Đây là code để "bóc tách" HTML, nó có thể hỏng 
-    // bất cứ lúc nào nếu Xvideos thay đổi giao diện.
-    
-    const title = $('h1.page-title').text().trim();
+    // === SỬA ĐỔI ĐỂ LẤY TIÊU ĐỀ ===
+    // Thử lấy từ thẻ <title> của trang, cách này ổn định hơn
+    let title = $('title').text().trim();
+    if (title) {
+        // Thường thẻ title sẽ có dạng "Tên Video - XVIDEOS.COM", ta loại bỏ phần đuôi
+        title = title.replace(/ - XVIDEOS\.COM$/i, '').trim();
+    }
+
+    // Nếu thẻ <title> không có, thử lại cách cũ (biết đâu vẫn hoạt động)
+    if (!title || title.length === 0) {
+        title = $('h1.page-title').text().trim();
+    }
+    // ================================
     
     let downloadLink = null;
     let duration = "Không rõ";
@@ -46,7 +48,7 @@ exports.handler = async (event, context) => {
         const scriptContent = $(el).html();
         if (scriptContent) {
             
-            // Tìm link high
+            // Tìm link high (cái này đang hoạt động tốt)
             if (!downloadLink) {
                 const match = scriptContent.match(videoUrlRegex);
                 if (match && match[1]) {
@@ -83,7 +85,7 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: title || "Không tìm thấy tiêu đề",
+        title: title || "Không tìm thấy tiêu đề", // Dùng title mới đã sửa
         downloadUrl: downloadLink,
         views: views,
         duration: duration
